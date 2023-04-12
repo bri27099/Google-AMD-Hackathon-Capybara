@@ -1,5 +1,13 @@
 import cv2
 from flask import Flask, render_template, Response
+import Movenet_w_feedback
+import time
+import tensorflow as tf
+import tensorflow_hub as hub
+import matplotlib.pyplot as plt
+import numpy as np
+import helper
+import cv2 as cv
 
 app = Flask(__name__)
 
@@ -14,18 +22,22 @@ def generate_frames():
     while True:
         # read the camera frame
         success, frame = camera.read()
+        plt.imsave(r"D:/Google-AMD-Hackathon-Capybara/Model/actual.jpg",frame)
         if not success:
             break
         else:
             # convert the frame to grayscale
-            gray = grayscale(frame)
+            
+            # yield the grayscale frame bytes to be displayed on the webpage
+            gray = Movenet_w_feedback.compare_two()
+            #print(type(output))
             # encode the grayscale frame in JPEG format
             ret, buffer = cv2.imencode('.jpg', gray)
             # convert the buffer to bytes
             frame_bytes = buffer.tobytes()
-            # yield the grayscale frame bytes to be displayed on the webpage
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+        #time.sleep(1)
 
 @app.route('/')
 def index():

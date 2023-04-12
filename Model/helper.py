@@ -132,7 +132,7 @@ def draw_prediction_on_image(
     A numpy array with shape [out_height, out_width, channel] representing the
     image overlaid with keypoint predictions.
   """
-  image = np.zeros(image.shape)
+  #image = np.zeros(image.shape)
   height, width, channel = image.shape
   aspect_ratio = float(width) / height
   fig, ax = plt.subplots(figsize=(12 * aspect_ratio, 12))

@@ -3,7 +3,7 @@ import tensorflow as tf
 import tensorflow_hub as hub
 import matplotlib.pyplot as plt
 import numpy as np
-from helper import *
+from helphelphelp import *
 import cv2 as cv
 
 # Load the input image.
