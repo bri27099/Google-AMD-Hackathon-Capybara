@@ -1,0 +1,288 @@
+# Import TF and TF Hub libraries.
+import tensorflow as tf
+import tensorflow_hub as hub
+import matplotlib.pyplot as plt
+import numpy as np
+from helper import *
+import cv2 as cv
+
+physical_devices = tf.config.list_physical_devices('GPU')
+try:
+  tf.config.experimental.set_memory_growth(physical_devices[0], True)
+except:
+  # Invalid device or cannot modify virtual devices once initialized.
+  pass
+
+# Load the input image.
+# image_path = r'C:\Users\brind\OneDrive\Pictures\Camera Roll\WIN_20230330_20_31_33_Pro.jpg'
+# image_path = r'/home/ayush/Desktop/Manipal/Google-AMD-Hackathon-Capybara/Pictures/Screenshot from 2023-03-07 00-20-05.jpg'
+
+# image = tf.io.read_file(image_path)
+
+# # print(type(image))
+# # print(image.shape())
+# image = tf.compat.v1.image.decode_jpeg(image)
+
+# image = tf.expand_dims(image, axis=0)
+# # Resize and pad the image to keep the aspect ratio and fit the expected size.
+# image = tf.cast(tf.image.resize_with_pad(image, 192, 192), dtype=tf.int32)
+
+# Download the model from TF Hub.
+model = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
+movenet = model.signatures['serving_default']
+keypoints_labels = ['nose', 'left_eye', 'right_eye', 'left_ear', 'right_ear', 'left_shoulder', 'right_shoulder', 'left_elbow', 'right_elbow', 'left_wrist', 'right_wrist', 'left_hip', 'right_hip', 'left_knee', 'right_knee', 'left_ankle', 'right_ankle']
+
+# Run model inference.
+# print(image.shape)
+
+
+# outputs = movenet(image)
+# # Output is a [1, 1, 17, 3] tensor.
+# keypoints = outputs['output_0']
+
+# # Define the connections between keypoints
+# print(outputs)
+# print(keypoints)
+
+# display_image = tf.expand_dims(image, axis=0)
+# display_image = tf.cast(tf.image.resize_with_pad(
+#     image, 1280, 1280), dtype=tf.int32)
+# output_overlay = draw_prediction_on_image(
+#     np.squeeze(display_image.numpy(), axis=0), keypoints)
+
+# plt.figure(figsize=(5, 5))
+# plt.imshow(output_overlay)
+# _ = plt.axis('off')
+# plt.show()
+path1 = r'/home/ayush/Desktop/Manipal/Google-AMD-Hackathon-Capybara/Pictures/sample2.jpg'
+path2 = r'/home/ayush/Desktop/Manipal/Google-AMD-Hackathon-Capybara/Pictures/actual2.jpg'
+
+image1 = tf.io.read_file(path1)
+image2 = tf.io.read_file(path2)
+
+image1 = tf.compat.v1.image.decode_jpeg(image1)
+image2 = tf.compat.v1.image.decode_jpeg(image2)
+
+def get_feedback(shape, output_overlay1, kp1, output_overlay2, kp2):
+
+
+    # kp1 = get_keypoints(shape, keypoints1)
+    # kp2 = get_keypoints(shape, keypoints2)
+
+    feedback_img = output_overlay1.copy()
+    
+    keypoints_to_label = ['left_shoulder', 'right_shoulder', 'left_wrist', 'right_wrist', 'left_knee', 'right_knee', 'left_ankle', 'right_ankle']
+    i = 0
+    for k1, k2, in zip(kp1, kp2):
+        if keypoints_labels[i] not in keypoints_to_label:
+            i+=1
+            continue
+        start_point, end_point = (int(k1[0]) - 80, int(k1[1]) - 60), (int(k2[0]) - 80, int(k2[1]) - 60)
+        feedback_img = cv.arrowedLine(feedback_img, start_point, end_point, 
+                    (255, 0, 0) , 13, tipLength = 0.2) 
+        i+=1
+    # plt.figure(figsize=(5, 5))
+    # plt.imshow(output_overlay1)
+    # _ = plt.axis('off')
+    # plt.show()
+
+    # print(kp1)
+    # print(kp2)
+    fig, axs = plt.subplots(1, 3)
+    fig.set_size_inches(8, 8)
+    fig.set_dpi(200)
+
+    # Display the images on each subplot
+    off = 200
+    axs[0].imshow(output_overlay1[off:-off, :], cmap='viridis')
+    axs[1].imshow(output_overlay2[off:-off, :], cmap='viridis')
+    axs[2].imshow(feedback_img[off:-off, :], cmap='viridis')
+
+    # Add titles to each subplot
+    axs[0].set_title('You')
+    axs[1].set_title('Them')
+    axs[2].set_title('Feedback')
+    
+    for ax in axs.flat:
+        ax.set_xticks([])
+        ax.set_yticks([])
+
+    plt.show()
+
+def get_roi(image_roi, keypoints):
+    min_x, min_y = np.min(keypoints, axis=0)
+    max_x, max_y = np.max(keypoints, axis=0)
+    print('In get_roi, img_shape = ', image_roi.shape)
+    roi = image_roi[int(min_y):int(max_y), int(min_x):int(max_x)]
+    plt.imshow(cv.rectangle(image_roi, (int(min_x),int(min_y)), (int(max_x),int(max_y)), (255, 0, 0), 3))
+    plt.show()
+
+    print(int(min_y),':',int(max_y),'|', int(min_x),':',int(max_x))
+    return roi   
+
+def compare_two(image1, image2):
+    img1, img2 = np.array(image1), np.array(image2)
+    image1 = tf.expand_dims(image1, axis=0)
+    image1 = tf.cast(tf.image.resize_with_pad(image1, 192, 192), dtype=tf.int32)
+
+
+    outputs1= movenet(image1)
+    keypoints1 = outputs1['output_0']
+
+    # print(outputs1)
+    # print(keypoints1)
+
+    display_image1 = tf.expand_dims(image1, axis=0)
+    display_image1 = tf.cast(tf.image.resize_with_pad(
+        image1, 1280, 1280), dtype=tf.int32)
+
+    shape = np.squeeze(display_image1.numpy()).shape
+
+    # print('here', keypoints1)
+    # kp1 = get_keypoints(shape, keypoints1)
+
+
+
+    output_overlay1 = draw_prediction_on_image(
+        np.squeeze(display_image1.numpy(), axis=0), keypoints1)
+
+    # plt.figure(figsize=(5, 5))
+    # plt.imshow(output_overlay1)
+    # _ = plt.axis('off')
+    # plt.show()
+
+    image2 = tf.expand_dims(image2, axis=0)
+    image2 = tf.cast(tf.image.resize_with_pad(image2, 192, 192), dtype=tf.int32)
+
+    outputs2= movenet(image2)
+    keypoints2 = outputs2['output_0']
+
+    # print(outputs2)
+    # print(keypoints2)
+
+    display_image2 = tf.expand_dims(image2, axis=0)
+    display_image2 = tf.cast(tf.image.resize_with_pad(
+        image2, 1280, 1280), dtype=tf.int32)
+    output_overlay2 = draw_prediction_on_image(
+        np.squeeze(display_image2.numpy(), axis=0), keypoints2)
+
+    # plt.figure(figsize=(5, 5))
+    # plt.imshow(output_overlay2)
+    # _ = plt.axis('off')
+    # plt.show()
+
+
+    shape = np.squeeze(display_image2.numpy()).shape
+    kp1 = get_keypoints(shape, keypoints1)
+    kp2 = get_keypoints(shape, keypoints2)
+
+    get_feedback(shape, output_overlay1, kp1, output_overlay2, kp2)
+    exit()
+def get_keypoints(
+    shape, keypoints_with_scores):
+
+    height, width, channel = shape
+    print('height, width', (height, width),'\ngetting keypoints')
+    aspect_ratio = float(width) / height
+
+
+    (keypoint_locs, keypoint_edges,
+    edge_colors) = keypoints_and_edges_for_display(
+       keypoints_with_scores, height, width)
+    # print(keypoint_locs)
+    return keypoint_locs
+
+
+
+compare_two(image1, image2)
+exit()
+  
+def predict_me(image_path):
+    # image_path = r'C:\Users\brind\OneDrive\Pictures\Camera Roll\WIN_20230330_20_31_33_Pro.jpg'
+    print(image_path)
+    image = tf.io.read_file(image_path)
+    # image = cv.imread(image_path)
+
+    image =tf.convert_to_tensor(image)
+    # # print()
+    image = tf.compat.v1.image.decode_jpeg(image)
+
+    image = tf.expand_dims(image, axis=0)
+    # Resize and pad the image to keep the aspect ratio and fit the expected size.
+    image = tf.cast(tf.image.resize_with_pad(image, 192, 192), dtype=tf.int32)
+
+    # # Download the model from TF Hub.
+    # # model = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
+    # # movenet = model.signatures['serving_default']
+
+    # Run model inference.
+    outputs = movenet(image)
+    print('predicted successfully')
+    # Output is a [1, 1, 17, 3] tensor.
+    keypoints = outputs['output_0']
+
+    # Define the connections between keypoints
+    # print(outputs)
+    # print(keypoints)
+
+    # display_image = tf.expand_dims(image, axis=0)
+    display_image = tf.cast(tf.image.resize_with_pad(
+        image, 1280, 1280), dtype=tf.int32)
+    output_overlay = draw_prediction_on_image(
+        np.squeeze(display_image.numpy(), axis=0), keypoints)
+    print('sucfully got output_overlay2')
+
+
+    # plt.imshow(output_overlay)
+    # plt.show()
+    # output_overlay = cv.resize(output_overlay, (192, 192))
+    # print(output_overlay.shape)
+    # plt.imshow(output_overlay)
+    # plt.show()
+
+    # cv.imshow('sds',np.zeros_like(output_overlay))
+    # cv.waitKey(0)
+    return output_overlay
+
+# define a video capture object
+vid = cv.VideoCapture(0)
+i = 0  
+while(True):
+      
+    # Capture the video frame
+    # by frame
+    ret, frame = vid.read()
+    file_path = r'/home/ayush/Desktop/Manipal/Google-AMD-Hackathon-Capybara/Pictures/our_yoga_fotos/'+'img_'+str(i)+'.jpg'
+    # cv.imwrite(file_path, cv.resize(frame, (192, 192)))
+    print('To predict file at: ', file_path)
+    # pred_img = predict_me(file_path)
+    print('still here.')
+    # Display the resulting frame
+    # cv.imshow('frame', frame)
+
+    # print(pred_img)
+    # print(pred_img.shape)
+
+    # cv.imshow('pred_frame', pred_img)
+    # # output_path = r'C:\Users\brind\OneDrive\Desktop\hacku\our_yoga_outputs' +'\img_'+str(i)+'.jpg'
+    output_path = r'/home/ayush/Desktop/Manipal/Google-AMD-Hackathon-Capybara/Pictures/points_on_blank/' +'img_'+str(i)+'.jpg'
+
+    # cv.imwrite(output_path, pred_img)
+    # plt.imsave(output_path, pred_img)
+    i+=1
+
+    # the 'q' button is set as the
+    # quitting button you may use any
+    # desired button of your choice
+    if cv.waitKey(1) & 0xFF == ord('q'):
+        break
+
+    if i == 100:
+        break
+
+    
+  
+# After the loop release the cap object
+vid.release()
+# Destroy all the windows
+cv2.destroyAllWindows()
