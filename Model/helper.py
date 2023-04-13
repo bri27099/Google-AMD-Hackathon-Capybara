@@ -139,7 +139,7 @@ def draw_prediction_on_image(
   # To remove the huge white borders
   fig.tight_layout(pad=0)
   ax.margins(0)
-  ax.set_yticklabels([])
+  ax.set_yticklabels([])  
   ax.set_xticklabels([])
   plt.axis('off')
 

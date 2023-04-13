@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import helper
 import cv2 as cv
-
+import time
 app = Flask(__name__)
 
 camera = cv2.VideoCapture(0)
@@ -37,11 +37,13 @@ def generate_frames():
             frame_bytes = buffer.tobytes()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-        #time.sleep(1)
+        #time.sleep(20)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    image_url = "images/bridge.jpg"
+    return render_template('index.html', image_url=image_url)
+    
 
 @app.route('/video_feed')
 def video_feed():

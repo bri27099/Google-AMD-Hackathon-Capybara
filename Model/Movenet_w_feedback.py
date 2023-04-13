@@ -58,7 +58,7 @@ path1 = r"D:/Google-AMD-Hackathon-Capybara/Model/actual.jpg"
 path2 = r"D:/Google-AMD-Hackathon-Capybara/Model/sample.jpg"
 
 
-
+'''
 def get_feedback(shape, output_overlay1, kp1, output_overlay2, kp2):
 
 
@@ -76,6 +76,7 @@ def get_feedback(shape, output_overlay1, kp1, output_overlay2, kp2):
         start_point, end_point = (int(k1[0]) - 80, int(k1[1]) - 60), (int(k2[0]) - 80, int(k2[1]) - 60)
         feedback_img = cv.arrowedLine(feedback_img, start_point, end_point, 
                     (255, 0, 0) , 13, tipLength = 0.2) 
+        feedback_img = cv.putText(feedback_img, '100', (600, 600), cv.FONT_HERSHEY_SIMPLEX, 50, (255, 0, 0), 2, cv.LINE_AA)
         i+=1
     # plt.figure(figsize=(5, 5))
     # plt.imshow(output_overlay1)
@@ -103,17 +104,17 @@ def get_feedback(shape, output_overlay1, kp1, output_overlay2, kp2):
         ax.set_xticks([])
         ax.set_yticks([])
 
-    plt.show()
+    plt.show()'''
 
 def get_roi(image_roi, keypoints):
     min_x, min_y = np.min(keypoints, axis=0)
     max_x, max_y = np.max(keypoints, axis=0)
-    print('In get_roi, img_shape = ', image_roi.shape)
+    #print('In get_roi, img_shape = ', image_roi.shape)
     roi = image_roi[int(min_y):int(max_y), int(min_x):int(max_x)]
     plt.imshow(cv.rectangle(image_roi, (int(min_x),int(min_y)), (int(max_x),int(max_y)), (255, 0, 0), 3))
     plt.show()
 
-    print(int(min_y),':',int(max_y),'|', int(min_x),':',int(max_x))
+    #print(int(min_y),':',int(max_y),'|', int(min_x),':',int(max_x))
     return roi   
 
 def compare_two():
@@ -189,7 +190,9 @@ def compare_two():
         start_point, end_point = (int(k1[0]) - 80, int(k1[1]) - 60), (int(k2[0]) - 80, int(k2[1]) - 60)
         feedback_img = cv.arrowedLine(feedback_img, start_point, end_point, 
                     (255, 0, 0) , 13, tipLength = 0.2) 
+        #feedback_img = cv.putText(feedback_img, '100', (600, 600), cv.FONT_HERSHEY_SIMPLEX, 50, (255, 0, 0), 2, cv.LINE_AA)
         i+=1
+    feedback_img = cv.putText(feedback_img, 'siduhi', (300, 300), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv.LINE_AA)
     # plt.figure(figsize=(5, 5))
     # plt.imshow(output_overlay1)
     # _ = plt.axis('off')
@@ -197,32 +200,32 @@ def compare_two():
 
     # print(kp1)
     # print(kp2)
-    fig, axs = plt.subplots(1, 3)
-    fig.set_size_inches(8, 8)
-    fig.set_dpi(200)
+    # fig, axs = plt.subplots(1, 3)
+    # fig.set_size_inches(8, 8)
+    # fig.set_dpi(200)
 
     # Display the images on each subplot
-    off = 200
     # axs[0].imshow(output_overlay1[off:-off, :], cmap='viridis')
     # axs[1].imshow(output_overlay2[off:-off, :], cmap='viridis')
     # axs[2].imshow(feedback_img[off:-off, :], cmap='viridis')
 
     # Add titles to each subplot
-    axs[0].set_title('You')
-    axs[1].set_title('Them')
-    axs[2].set_title('Feedback')
+    # axs[0].set_title('You')
+    # axs[1].set_title('Them')
+    # axs[2].set_title('Feedback')
     
-    for ax in axs.flat:
-        ax.set_xticks([])
-        ax.set_yticks([])
+    # for ax in axs.flat:
+    #     ax.set_xticks([])
+    #     ax.set_yticks([])
 
     return feedback_img
+    
     #exit()
 def get_keypoints(
     shape, keypoints_with_scores):
 
     height, width, channel = shape
-    print('height, width', (height, width),'\ngetting keypoints')
+    #print('height, width', (height, width),'\ngetting keypoints')
     aspect_ratio = float(width) / height
 
 
