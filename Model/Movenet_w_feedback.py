@@ -55,7 +55,7 @@ keypoints_labels = ['nose', 'left_eye', 'right_eye', 'left_ear', 'right_ear', 'l
 # _ = plt.axis('off')
 # plt.show()
 path1 = r"D:/Google-AMD-Hackathon-Capybara/Model/actual.jpg"
-path2 = r"D:/Google-AMD-Hackathon-Capybara/Model/sample.jpg"
+# path2 = r"D:/Google-AMD-Hackathon-Capybara/Model/sample.jpg"
 
 
 '''
@@ -117,10 +117,11 @@ def get_roi(image_roi, keypoints):
     #print(int(min_y),':',int(max_y),'|', int(min_x),':',int(max_x))
     return roi   
 
-def compare_two():
+def compare_two(path2):
+    
     image1 = tf.io.read_file(path1)
     image2 = tf.io.read_file(path2)
-
+    print(path2)
     image1 = tf.compat.v1.image.decode_jpeg(image1)
     image2 = tf.compat.v1.image.decode_jpeg(image2)
 
@@ -192,7 +193,7 @@ def compare_two():
                     (255, 0, 0) , 13, tipLength = 0.2) 
         #feedback_img = cv.putText(feedback_img, '100', (600, 600), cv.FONT_HERSHEY_SIMPLEX, 50, (255, 0, 0), 2, cv.LINE_AA)
         i+=1
-    feedback_img = cv.putText(feedback_img, 'siduhi', (300, 300), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv.LINE_AA)
+    feedback_img = cv.putText(feedback_img, path2[path2.index('/')+1: -3], (300, 300), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv.LINE_AA)
     # plt.figure(figsize=(5, 5))
     # plt.imshow(output_overlay1)
     # _ = plt.axis('off')

@@ -98,34 +98,19 @@
                            <div class="row">
                               <div class="col-md-5">
                                  <div class="yo_img">
-                                    <figure><img src="{{ url_for('video_feed') }}"   height="500" width="450"></figure>
+                                    <figure><img src="{{ url_for('video_feed') }}"  height="500" width="500" /></figure>
                                  </div>
                               </div>
-                              
-
-
-                              <!-- <div class="col-md-7">
+                              <div class="col-md-7">
                                  <div class="yoga_box">
                                     
-                                       <figure><img src="{{ url_for('static', filename='images/bridge.jpg') }}"  height="500" width="500" /></figure>
+                                       <figure><img src="{{ url_for('static', filename='images/tree.jpg') }}"  height="500" width="500" /></figure>
                                        <form method="POST" action="{{ url_for('change_image') }}">
                                           <input type="submit" value="Pose done bosss" name="action1">
-                                      </form> -->
+                                      </form>
                                     
-                                      <img id="my-image" src="{{ url_for('static', filename='images/bridge.jpg') }}" height="259" width="450">
-                                  
-                                      <script>
-                                          function changeImage() {
-                                              fetch('/get_new_image')
-                                                  .then(response => response.blob())
-                                                  .then(blob => {
-                                                      var url = URL.createObjectURL(blob);
-                                                      document.getElementById('my-image').src = url;
-                                                  });
-                                          }
-                                      </script>
                      
-                                    <a class="read_more yoga_btn" role="button"  onclick="changeImage()">Change Pose Mommy!!!</a>
+                                    <a class="read_more yoga_btn" href="index.html" role="button">Contact us</a>
                                  </div>
                               </div>
                            </div>
