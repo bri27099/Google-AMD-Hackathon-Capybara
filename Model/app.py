@@ -113,5 +113,17 @@ def get_new_image():
         if i == 15:
             return 0
         return send_file(output, mimetype='image/jpeg')
+    
+@app.route('/intermediate',methods=['POST','GET'])
+def intermediate():
+    return render_template('index1.html')
+
+@app.route('/advanced',methods=['POST','GET'])
+def advanced():
+    return render_template('index1.html')
+
+@app.route('/beginner',methods=['POST','GET'])
+def beginner():
+    return render_template('index.html')
 if __name__ == '__main__':
     app.run(debug=True)

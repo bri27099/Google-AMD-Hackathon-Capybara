@@ -111,8 +111,8 @@ def get_roi(image_roi, keypoints):
     max_x, max_y = np.max(keypoints, axis=0)
     #print('In get_roi, img_shape = ', image_roi.shape)
     roi = image_roi[int(min_y):int(max_y), int(min_x):int(max_x)]
-    plt.imshow(cv.rectangle(image_roi, (int(min_x),int(min_y)), (int(max_x),int(max_y)), (255, 0, 0), 3))
-    plt.show()
+    #plt.imshow(cv.rectangle(image_roi, (int(min_x),int(min_y)), (int(max_x),int(max_y)), (255, 0, 0), 3))
+    #plt.show()
 
     #print(int(min_y),':',int(max_y),'|', int(min_x),':',int(max_x))
     return roi   
