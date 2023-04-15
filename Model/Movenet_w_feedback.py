@@ -13,6 +13,7 @@ except:
   # Invalid device or cannot modify virtual devices once initialized.
   pass
 
+IMG_SIZE = 0
 # Load the input image.
 # image_path = r'C:\Users\brind\OneDrive\Pictures\Camera Roll\WIN_20230330_20_31_33_Pro.jpg'
 # image_path = r'/home/ayush/Desktop/Manipal/Google-AMD-Hackathon-Capybara/Pictures/Screenshot from 2023-03-07 00-20-05.jpg'
@@ -117,8 +118,42 @@ def get_roi(image_roi, keypoints):
     #print(int(min_y),':',int(max_y),'|', int(min_x),':',int(max_x))
     return roi   
 
-def compare_two(path2):
+def eucl_dist(p1, p2):
+    return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
+
+
+def score_frame(kp1, kp2):
+    global IMG_SIZE
+    IMG_SIZE = 1280
+    #print('IMG_SIZE = ', IMG_SIZE)
+    i = 0
+
+    scores = []
+    max_val = 0
+    for k1, k2, in zip(kp1, kp2):
+        dist = eucl_dist(k1, k2)
+        norm_dist = (1/dist) / (1/IMG_SIZE)
+        # avg_score += norm_dist
+        scores.append(norm_dist)
+
+       # print('Score: ', norm_dist)
     
+    avg_score = 0
+
+    norm_scores = []
+    for score in scores:
+        norm_score = max(1, score/45)
+        norm_scores.append(norm_score)
+        avg_score += norm_score
+
+
+    # avg_score = round(avg_score/len(keypoints_labels) * 100, 2)
+   # print('Average score for frame: ', avg_score/len(keypoints_labels))
+    return (avg_score/len(keypoints_labels) * 100)
+
+    
+def compare_two(path2):
+    global IMG_SIZE
     image1 = tf.io.read_file(path1)
     image2 = tf.io.read_file(path2)
     print(path2)
@@ -126,6 +161,9 @@ def compare_two(path2):
     image2 = tf.compat.v1.image.decode_jpeg(image2)
 
     img1, img2 = np.array(image1), np.array(image2)
+
+    IMG_SIZE = img2.shape[0]
+
     image1 = tf.expand_dims(image1, axis=0)
     image1 = tf.cast(tf.image.resize_with_pad(image1, 192, 192), dtype=tf.int32)
 
@@ -179,7 +217,7 @@ def compare_two(path2):
     shape = np.squeeze(display_image2.numpy()).shape
     kp1 = get_keypoints(shape, keypoints1)
     kp2 = get_keypoints(shape, keypoints2)
-
+    score = score_frame(kp1,kp2)
     feedback_img = output_overlay1.copy()
     
     keypoints_to_label = ['left_shoulder', 'right_shoulder', 'left_wrist', 'right_wrist', 'left_knee', 'right_knee', 'left_ankle', 'right_ankle']
@@ -219,7 +257,7 @@ def compare_two(path2):
     #     ax.set_xticks([])
     #     ax.set_yticks([])
 
-    return feedback_img
+    return feedback_img, score
     
     #exit()
 def get_keypoints(

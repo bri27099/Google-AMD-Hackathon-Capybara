@@ -62,10 +62,10 @@
                               <li class="nav-item">
                                  <a class="nav-link" href="{{ url_for('beginner') }}">Beginner</a>
                               </li>
-                              <li class="nav-item active">
+                              <li class="nav-item">
                                  <a class="nav-link" href="{{ url_for('intermediate') }}">Intermediate</a>
                               </li>
-                              <li class="nav-item">
+                              <li class="nav-item active">
                                  <a class="nav-link" href="{{ url_for('advanced') }}">Advanced</a>
                               </li>
                            </ul>
@@ -106,11 +106,11 @@
                                           <input type="submit" value="Pose done bosss" name="action1">
                                       </form> -->
                                     
-                                      <img id="my-image" src="{{ url_for('static', filename='images/boat.jpg') }}" height="259" width="450">
+                                      <img id="my-image" src="{{ url_for('static', filename='images/dancer.jpg') }}" height="259" width="450">
                                   
                                       <script>
                                           function changeImage() {
-                                              fetch('/get_new_image1')
+                                              fetch('/get_new_image2')
                                                   .then(response => response.blob())
                                                   .then(blob => {
                                                       var url = URL.createObjectURL(blob);
@@ -119,26 +119,26 @@
                                           }
                                       </script>
                                     <div>
-                                       <label for="my_int" style="color: black; font-size: 32px;">       Points : </label>
-                                       <span id="my_int" style="color: black; font-size: 32px;"></span>
-                                     </div>
-                                     
-                                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                                     <script>
-                                       $(function() {
-                                         setInterval(updateInt, 5000); // Update integer every 5 seconds
-                                       });
-                                   
-                                       function updateInt() {
-                                         $.ajax({
-                                           url: '/get_int', // URL for the Flask route that returns the integer value
-                                           method: 'GET',
-                                           success: function(data) {
-                                             $('#my_int').text(data.my_int); // Update the integer
-                                           }
-                                         });
-                                       }
-                                     </script>
+                                        <label for="my_int" style="color: black; font-size: 32px;">       Points : </label>
+                                        <span id="my_int" style="color: black; font-size: 32px;"></span>
+                                      </div>
+                                      
+                                      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                      <script>
+                                        $(function() {
+                                          setInterval(updateInt, 5000); // Update integer every 5 seconds
+                                        });
+                                    
+                                        function updateInt() {
+                                          $.ajax({
+                                            url: '/get_int', // URL for the Flask route that returns the integer value
+                                            method: 'GET',
+                                            success: function(data) {
+                                              $('#my_int').text(data.my_int); // Update the integer
+                                            }
+                                          });
+                                        }
+                                      </script>
                                     <a class="read_more yoga_btn" role="button"  onclick="changeImage()">Change Pose</a>
                                  </div>
                               </div>

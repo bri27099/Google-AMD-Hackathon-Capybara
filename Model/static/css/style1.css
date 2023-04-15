@@ -447,24 +447,7 @@ button {
      transition: ease-in all 0.5s;
 }
 
-.read_more1 {
-     font-size: 18px;
-     background-color: #001935;
-     color: #fff;
-     padding: 9px 0px;
-     width: 100%;
-     max-width: 157px;
-     text-align: center;
-     display: inline-block;
-     transition: ease-in all 0s;
-     font-weight:750;
-}
 
-.read_more1:hover {
-     background: #ef8efe;
-     color: #fff;
-     transition: ease-in all 0.2s;
-}
 /** our classes section **/
 
 .classes {
@@ -514,16 +497,7 @@ button {
      margin: 0 auto;
      display: block;
 }
-.yoga_btn1 {
-     max-width: 235px;
-     height: 60px;
-     padding: 15px 0;
-     margin-top: 45px;
-     margin-top: 45px !important;
-     border-radius: 100px;
-     margin: 0 auto;
-     display: block;
-}
+
 
 /** end our classes section **/
 

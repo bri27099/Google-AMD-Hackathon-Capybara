@@ -56,10 +56,10 @@
                         </button>
                         <div class="collapse navbar-collapse" id="navbarsExample04">
                            <ul class="navbar-nav mr-auto">
-                              <li class="nav-item active">
+                              <li class="nav-item">
                                  <a class="nav-link" href="{{ url_for('home') }}">Home</a>
                               </li>
-                              <li class="nav-item">
+                              <li class="nav-item active">
                                  <a class="nav-link" href="{{ url_for('beginner') }}">Beginner</a>
                               </li>
                               <li class="nav-item">
@@ -105,7 +105,7 @@
                                        <form method="POST" action="{{ url_for('change_image') }}">
                                           <input type="submit" value="Pose done bosss" name="action1">
                                       </form> -->
-                                    
+                                    <div class = "imfasm">
                                       <img id="my-image" src="{{ url_for('static', filename='images/bridge.jpg') }}" height="259" width="450">
                                   
                                       <script>
@@ -118,8 +118,29 @@
                                                   });
                                           }
                                       </script>
-                     
-                                    <a class="read_more yoga_btn" role="button"  onclick="changeImage()">Change Pose Mommy!!!</a>
+                                    </div>
+                                    <div>
+                                       <label for="my_int" style="color: black; font-size: 32px;">       Points : </label>
+                                       <span id="my_int" style="color: black; font-size: 32px;"></span>
+                                     </div>
+                                     
+                                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                     <script>
+                                       $(function() {
+                                         setInterval(updateInt, 5000); // Update integer every 5 seconds
+                                       });
+                                   
+                                       function updateInt() {
+                                         $.ajax({
+                                           url: '/get_int', // URL for the Flask route that returns the integer value
+                                           method: 'GET',
+                                           success: function(data) {
+                                             $('#my_int').text(data.my_int); // Update the integer
+                                           }
+                                         });
+                                       }
+                                     </script>
+                                    <a class="read_more yoga_btn" role="button"  onclick="changeImage()">Change Pose</a>
                                  </div>
                               </div>
                            </div>
