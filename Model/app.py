@@ -11,6 +11,8 @@ import cv2 as cv
 import time
 import threading
 import io
+import os
+import base64
 from PIL import Image
 from flask import Flask, render_template, Response, redirect, url_for, session, request, send_file
 app = Flask(__name__)
@@ -33,8 +35,11 @@ score = 0
 i = 0
 count = 0
 my_int=0
-
+text_disp=''
+text=''
 camera = cv2.VideoCapture(0)
+
+
 
 def grayscale(frame):
     # convert the frame to grayscale
@@ -43,56 +48,84 @@ def grayscale(frame):
 
 def update_int():
     global my_int
+    global text_disp
+    global text
     while True:
         new_int = int(score)
         my_int = new_int
-        time.sleep(2)
+        text_disp = text
+        print(text_disp)
+        time.sleep(5)
 
 def generate_frames():
     global i
     global page
     global score
+    global text
     while True:
         # read the camera frame
+        # convert the frame to grayscale
         success, frame = camera.read()
-        plt.imsave(r"D:/Google-AMD-Hackathon-Capybara/Model/actual.jpg",frame)
-        if not success:
-            break
-        else:
-            # convert the frame to grayscale
-            
-            # yield the grayscale frame bytes to be displayed on the webpage
-            if (page=='beginner'):
-                gray, score = Movenet_w_feedback.compare_two(ref_imgs[i%3])
-            if (page=='intermediate'):
-                gray, score = Movenet_w_feedback.compare_two(ref_imgs_int[i%3])
-            if (page=='advanced'):
-                gray, score = Movenet_w_feedback.compare_two(ref_imgs_adv[i%3])
-            print(score)
-            #print('i inside gen_frame: ', i)
+        plt.imsave(r"./actual.jpg",frame)
+        # yield the grayscale frame bytes to be displayed on the webpage
+        if (page=='beginner'):
+            gray, score, text = Movenet_w_feedback.compare_two(ref_imgs[i%3])
+        if (page=='intermediate'):
+            gray, score, text = Movenet_w_feedback.compare_two(ref_imgs_int[i%3])
+        if (page=='advanced'):
+            gray, score, text = Movenet_w_feedback.compare_two(ref_imgs_adv[i%3])
+        #print(score)
+        #print('i inside gen_frame: ', i)
 
-            #print(type(output))
-            # encode the grayscale frame in JPEG format
-            ret, buffer = cv2.imencode('.jpg', gray)
-            # convert the buffer to bytes
-            frame_bytes = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+        #print(type(output))
+        # encode the grayscale frame in JPEG format
+        ret, buffer = cv2.imencode('.jpg', gray)
+        # convert the buffer to bytes
+        frame_bytes = buffer.tobytes()
+        yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
         #time.sleep(20)
 
 def give_bro():
     while True:
-        img=cv.imread("D:\Google-AMD-Hackathon-Capybara\Model\static\images\bridge.png")
+        img=cv.imread(".\static\images\bridge.png")
         frame_bytes = img.tobytes()
         yield (b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
 
 @app.route('/',methods=['POST','GET'])
 def index():
-    return render_template('home.html')
+    return render_template('index.html')
 
-@app.route('/butt',methods=['POST','GET'])
+# @app.route('/upload', methods=['POST'])
+# def upload():
+#     # Get the image data from the POST request
+#     img = request.files['image'].read()
+
+#     # Decode the image data
+#     nparr = np.fromstring(img, np.uint8)
+#     frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+#     # Save the image as 'actual.jpg'
+#     cv2.imwrite('actual.jpg', frame)
+
+#     # Return a response to the client
+#     return 'Image uploaded successfully!'
+@app.route('/capture', methods=['POST'])
+def capture():
+    image_data = request.form['image']
+    encoded_data = image_data.split(',')[1]
+    decoded_data = base64.b64decode(encoded_data)
+    with open('actual1.jpg', 'wb') as f:
+        f.write(decoded_data)
+    #print(image_data)
+    return 'Image saved successfully.'
+
+
+@app.route('/home',methods=['POST','GET'])
 def home():
+    global i
+    i=0
     return render_template('home.html')
 
 @app.route('/reference_img',methods=['POST','GET'])
@@ -216,9 +249,10 @@ def beginner():
 @app.route('/get_int')
 def return_int():
     global my_int
-    return jsonify(my_int=my_int, my_text=get_text(my_int))
+    global text_disp
+    return jsonify(my_int=my_int, my_text=get_text1(my_int),get_text=text_disp)
 
-def get_text(my_int):
+def get_text1(my_int):
     global i
     global page
     if (page=="beginner"):

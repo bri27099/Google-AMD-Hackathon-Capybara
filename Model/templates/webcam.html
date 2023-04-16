@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Webcam Video Streaming</title>
+    </head>
+    <body>
+        <video id="video" width="500" height="500" autoplay></video>
+        <button id="start">Start Recording</button>
+        <button id="stop">Stop Recording</button>
+        <script>
+            var video = document.querySelector("#video");
+            var startButton = document.querySelector("#start");
+            var stopButton = document.querySelector("#stop");
+            var mediaRecorder = null;
+            var chunks = [];
+
+            navigator.mediaDevices.getUserMedia({video: true})
+                .then(function(stream) {
+                    video.srcObject = stream;
+                    mediaRecorder = new MediaRecorder(stream);
+
+                    startButton.addEventListener('click', function() {
+                        mediaRecorder.start();
+                    });
+
+                    stopButton.addEventListener('click', function() {
+                        mediaRecorder.stop();
+                    });
+
+                    mediaRecorder.addEventListener('dataavailable', function(event) {
+                        chunks.push(event.data);
+                    });
+
+                    mediaRecorder.addEventListener('stop', function() {
+                        var blob = new Blob(chunks, { 'type' : 'video/webm' });
+                        var url = window.URL.createObjectURL(blob);
+                        var videoPlayer = document.createElement('video');
+                        videoPlayer.controls = true;
+                        videoPlayer.src = url;
+                        document.body.appendChild(videoPlayer);
+
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('POST', '/upload', true);
+                        xhr.setRequestHeader('Content-Type', 'video/webm');
+                        xhr.onreadystatechange = function() {
+                            if (xhr.readyState === 4 && xhr.status === 200) {
+                                console.log(xhr.responseText);
+                            }
+                        };
+                        xhr.send(blob);
+                    });
+                })
+                .catch(function(error) {
+                    console.error(error);
+                });
+        </script>
+    </body>
+</html>

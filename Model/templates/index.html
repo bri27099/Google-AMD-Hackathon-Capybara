@@ -120,12 +120,18 @@
                                       </script>
                                     </div>
                                     <div>
-                                       <label for="my_int" style="color: black; font-size: 32px;">   &emsp;    Points : </label>
-                                       <span id="my_int" style="color: black; font-size: 32px;"></span>
+                                       <label for="my_int" style="color: #441c43; font-size: 32px;">   &emsp;    Points : </label>
+                                       <span id="my_int" style="color: #441c43; font-size: 32px;"></span>
                                        
                                      </div>
                                      <div>
-                                       <span id="my_text" style="color: black; font-size: 24px;"></span>
+                                       <span id="my_text" style="color: #441c43; font-size: 24px;"></span>
+                                       <br>
+                                       <span id="get_text" style="color: #441c43; font-size: 24px;"></span>
+                                     </div>
+                                     
+                                     <div>
+                                       
                                      </div>
                                      
                                      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -141,6 +147,7 @@
                                            success: function(data) {
                                              $('#my_int').text(data.my_int); // Update the integer
                                              $('#my_text').text(data.my_text);
+                                             $('#get_text').text(data.get_text);
                                            }
                                          });
                                        }

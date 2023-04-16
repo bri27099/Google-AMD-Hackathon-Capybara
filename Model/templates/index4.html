@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Webcam Capture</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <h1>Webcam Capture</h1>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <button id="capture">Capture Frame</button>
+    <script>
+      // Get references to video and canvas elements
+      var video = document.getElementById('video');
+      var canvas = document.getElementById('canvas');
+
+      // Get access to webcam
+      navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+        video.srcObject = stream;
+        video.play();
+      });
+
+      // Capture frame from video stream
+      function capture() {
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        var dataURL = canvas.toDataURL();
+        sendImage(dataURL);
+      }
+
+      // Send image data to Flask server via AJAX request
+      function sendImage(dataURL) {
+        $.ajax({
+          type: 'POST',
+          url: '/capture',
+          data: { image: dataURL },
+          success: function() {
+            console.log('Image sent successfully');
+          }
+        });
+      }
+
+      // Attach click event listener to capture button
+      document.getElementById('capture').addEventListener('click', capture);
+    </script>
+  </body>
+</html>

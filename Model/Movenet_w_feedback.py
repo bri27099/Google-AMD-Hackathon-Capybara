@@ -32,7 +32,9 @@ IMG_SIZE = 0
 model = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
 movenet = model.signatures['serving_default']
 keypoints_labels = ['nose', 'left_eye', 'right_eye', 'left_ear', 'right_ear', 'left_shoulder', 'right_shoulder', 'left_elbow', 'right_elbow', 'left_wrist', 'right_wrist', 'left_hip', 'right_hip', 'left_knee', 'right_knee', 'left_ankle', 'right_ankle']
-
+keypoints_to_label = ['left_shoulder', 'right_shoulder', 'left_wrist', 'right_wrist', 'left_knee', 'right_knee', 'left_ankle', 'right_ankle']
+keypoints_to_label1 = ['left shoulder', 'right shoulder', 'left wrist', 'right wrist', 'left knee', 'right knee', 'left ankle', 'right ankle']
+keypoints_labels1 = ['nose', 'left eye', 'right eye', 'left ear', 'right ear', 'left shoulder', 'right shoulder', 'left elbow', 'right elbow', 'left wrist', 'right wrist', 'left hip', 'right hip', 'left knee', 'right knee', 'left ankle', 'right ankle']
 # Run model inference.
 # print(image.shape)
 
@@ -55,7 +57,7 @@ keypoints_labels = ['nose', 'left_eye', 'right_eye', 'left_ear', 'right_ear', 'l
 # plt.imshow(output_overlay)
 # _ = plt.axis('off')
 # plt.show()
-path1 = r"D:/Google-AMD-Hackathon-Capybara/Model/actual.jpg"
+path1 = "./actual.jpg"
 # path2 = r"D:/Google-AMD-Hackathon-Capybara/Model/sample.jpg"
 
 
@@ -135,17 +137,37 @@ def score_frame(kp1, kp2):
     scores = []
     i = 0
     avg_score = 0
+    worst_score = eucl_dist(kp1[0], kp2[0])
+    idx = 0
+
     for k1, k2, in zip(kp1, kp2):
+        if keypoints_labels[i] not in keypoints_to_label:
+            i+=1
+            continue
         dist = eucl_dist(k1, k2)
         score = max(0, (1 - 1.3*dist/max_dist))
-        print('score for ', keypoints_labels[i], ': ', score)
+        if score < worst_score:
+            worst_score = score
+            idx = i
+        #print('score for ', keypoints_labels[i], ': ', score)
         avg_score += score    
         i+=1
 
 
+
+    worst_keyp = keypoints_labels1[idx]
+    w1, w2 = kp1[idx], kp2[idx]
+    angle = np.arctan((w2[1] - w1[1])/(w2[0] - w1[0]))*(180/np.pi)
+
+    text = 'Move '+worst_keyp+ ' '
+    if 0 < angle < 180:
+        text += 'up.'
+    else:
+        text += 'down.'
+    #print(text)
     avg_score = round(avg_score/i * 100, 2)
-    print('Average score for frame: ', avg_score)
-    return avg_score
+    #print('Average score for frame: ', avg_score)
+    return avg_score,text
 
     
 def compare_two(path2):
@@ -213,21 +235,21 @@ def compare_two(path2):
     shape = np.squeeze(display_image2.numpy()).shape
     kp1 = get_keypoints(shape, keypoints1)
     kp2 = get_keypoints(shape, keypoints2)
-    score = score_frame(kp1,kp2)
+    score,text = score_frame(kp1,kp2)
     feedback_img = output_overlay1.copy()
     
-    keypoints_to_label = ['left_shoulder', 'right_shoulder', 'left_wrist', 'right_wrist', 'left_knee', 'right_knee', 'left_ankle', 'right_ankle']
     i = 0
     for k1, k2, in zip(kp1, kp2):
         if keypoints_labels[i] not in keypoints_to_label:
             i+=1
             continue
         start_point, end_point = (int(k1[0]) - 80, int(k1[1]) - 60), (int(k2[0]) - 80, int(k2[1]) - 60)
+        #print(start_point,end_point)
         feedback_img = cv.arrowedLine(feedback_img, start_point, end_point, 
                     (255, 0, 0) , 13, tipLength = 0.2) 
         #feedback_img = cv.putText(feedback_img, '100', (600, 600), cv.FONT_HERSHEY_SIMPLEX, 50, (255, 0, 0), 2, cv.LINE_AA)
         i+=1
-    feedback_img = cv.putText(feedback_img, path2[path2.index('/')+1: -3], (300, 300), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv.LINE_AA)
+    #feedback_img = cv.putText(feedback_img, path2[path2.index('/')+1: -3], (300, 300), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv.LINE_AA)
     # plt.figure(figsize=(5, 5))
     # plt.imshow(output_overlay1)
     # _ = plt.axis('off')
@@ -253,7 +275,7 @@ def compare_two(path2):
     #     ax.set_xticks([])
     #     ax.set_yticks([])
 
-    return feedback_img, score
+    return feedback_img, score, text
     
     #exit()
 def get_keypoints(
