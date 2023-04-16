@@ -123,24 +123,29 @@ def eucl_dist(p1, p2):
 
 
 def score_frame(kp1, kp2):
-    global IMG_SIZE
-    IMG_SIZE = 1280
-    #print('IMG_SIZE = ', IMG_SIZE)
-    i = 0
+    
+    max_x = max([p[0] for p in np.vstack((kp1, kp2))])
+    max_y = max([p[1] for p in np.vstack((kp1, kp2))])
 
-    avg_dist = 0
-    max_val = 0
+    min_x = min([p[0] for p in np.vstack((kp1, kp2))])
+    min_y = min([p[1] for p in np.vstack((kp1, kp2))])
+
+    max_dist = eucl_dist((min_x, min_y), (max_x, max_y))
+
+    scores = []
+    i = 0
+    avg_score = 0
     for k1, k2, in zip(kp1, kp2):
         dist = eucl_dist(k1, k2)
-        avg_dist+=dist
-    avg_dist = avg_dist/len(keypoints_labels)
-       # print('Score: ', norm_dist)
-    avg_score = 100 - (avg_dist/700)*100
-    print('avgsxore',avg_score)
+        score = max(0, (1 - 1.3*dist/max_dist))
+        print('score for ', keypoints_labels[i], ': ', score)
+        avg_score += score    
+        i+=1
 
-    # avg_score = round(avg_score/len(keypoints_labels) * 100, 2)
-    #print('Average score for frame: ', avg_score/len(keypoints_labels))
-    return (avg_score)
+
+    avg_score = round(avg_score/i * 100, 2)
+    print('Average score for frame: ', avg_score)
+    return avg_score
 
     
 def compare_two(path2):

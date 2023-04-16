@@ -45,8 +45,7 @@ def update_int():
     global my_int
     while True:
         new_int = int(score)
-        if (new_int > my_int):
-            my_int = new_int
+        my_int = new_int
         time.sleep(2)
 
 def generate_frames():
