@@ -24,6 +24,10 @@ ref_imgs1 = ['static/images/tree.jpg', 'static/images/cobra.png',  'static/image
 ref_imgs2 = [ 'static/images/ddog.jpg', 'static/images/triangle.jpg','static/images/boat.jpg']
 ref_imgs3 = [ 'static/images/crow.jpg', 'static/images/forward_bendC.jpg', 'static/images/dancer.jpg']
 
+pose_text=["Setu Bandha Sarvangasana (Bridge)","Vrikshasana (Tree)","Bhujangasana (Cobra)"]
+pose_text_int=["Paripurna Navasana (Boat)","Adho Mukha Shvanasana (Downward Dog)","Trikonasana (Triangle)"]
+pose_text_adv=["Bakasana (Crow)","Prasarita Padottanasana C (Forward Bend C)","Natarajasana (Dancer)"]
+
 page='beginner'
 score = 0
 i = 0
@@ -41,7 +45,8 @@ def update_int():
     global my_int
     while True:
         new_int = int(score)
-        my_int = new_int
+        if (new_int > my_int):
+            my_int = new_int
         time.sleep(2)
 
 def generate_frames():
@@ -211,7 +216,18 @@ def beginner():
 
 @app.route('/get_int')
 def return_int():
-    return jsonify({'my_int': my_int})
+    global my_int
+    return jsonify(my_int=my_int, my_text=get_text(my_int))
+
+def get_text(my_int):
+    global i
+    global page
+    if (page=="beginner"):
+        return (pose_text[i%3])
+    if (page=="intermediate"):
+        return (pose_text_int[i%3])
+    if (page=="advanced"):
+        return (pose_text_adv[i%3])
 
 
 if __name__ == '__main__':

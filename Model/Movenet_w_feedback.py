@@ -128,35 +128,26 @@ def score_frame(kp1, kp2):
     #print('IMG_SIZE = ', IMG_SIZE)
     i = 0
 
-    scores = []
+    avg_dist = 0
     max_val = 0
     for k1, k2, in zip(kp1, kp2):
         dist = eucl_dist(k1, k2)
-        norm_dist = (1/dist) / (1/IMG_SIZE)
-        # avg_score += norm_dist
-        scores.append(norm_dist)
-
+        avg_dist+=dist
+    avg_dist = avg_dist/len(keypoints_labels)
        # print('Score: ', norm_dist)
-    
-    avg_score = 0
-
-    norm_scores = []
-    for score in scores:
-        norm_score = max(1, score/45)
-        norm_scores.append(norm_score)
-        avg_score += norm_score
-
+    avg_score = 100 - (avg_dist/700)*100
+    print('avgsxore',avg_score)
 
     # avg_score = round(avg_score/len(keypoints_labels) * 100, 2)
-   # print('Average score for frame: ', avg_score/len(keypoints_labels))
-    return (avg_score/len(keypoints_labels) * 100)
+    #print('Average score for frame: ', avg_score/len(keypoints_labels))
+    return (avg_score)
 
     
 def compare_two(path2):
     global IMG_SIZE
     image1 = tf.io.read_file(path1)
     image2 = tf.io.read_file(path2)
-    print(path2)
+    #print(path2)
     image1 = tf.compat.v1.image.decode_jpeg(image1)
     image2 = tf.compat.v1.image.decode_jpeg(image2)
 
